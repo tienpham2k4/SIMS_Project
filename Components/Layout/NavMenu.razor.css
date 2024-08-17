@@ -80,9 +80,10 @@
     }
 
     .nav-item ::deep .nav-link {
-        color: #d7d7d7;
+        color: white;
         background: none;
         border: none;
+        font-weight: 600;
         border-radius: 4px;
         height: 3rem;
         display: flex;
