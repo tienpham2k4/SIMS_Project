@@ -3,24 +3,49 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using BlazorApp3.Models
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IDbContextFactory<BlazorApp3.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Index</PageTitle>
 
-<h1>Subjects</h1>
+@code {
+    private bool isAuthenticated;
 
-<p>
-    <a href="subjects/create"><i class="fa-solid fa-square-plus"></i></a>
-</p>
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity.IsAuthenticated;
 
-<QuickGrid Class="table" Items="DbFactory.CreateDbContext().Subjects.Include(m => m.Major)">
-    <PropertyColumn Property="subjects => subjects.Name" />
-    <PropertyColumn Property="subjects => subjects.Major.Name" Title="Major" />
-    <PropertyColumn Property="subjects => subjects.Code" />
+        if (!isAuthenticated)
+        {
+            // Thực hiện điều hướng ngay lập tức
+            Navigation.NavigateTo("/Account/Login", true);
+            return; // Trả về ngay để tránh việc tiếp tục render trang
+        }
+    }
+}
 
-    <TemplateColumn Context="subjects">
-        <a href="@($"subjects/edit?id={subjects.Id}")"><i class="fa-solid fa-pen-to-square"></i></a> |
-        <a href="@($"subjects/details?id={subjects.Id}")"><i class="fa-solid fa-circle-info"></i></a> |
-        <a href="@($"subjects/delete?id={subjects.Id}")"><i class="fa-solid fa-trash"></i></a>
-    </TemplateColumn>
-</QuickGrid>
+<PageTitle>Index</PageTitle>
+
+@if (isAuthenticated)
+{
+    <h1>Subjects</h1>
+
+    <p>
+        <a href="subjects/create"><i class="fa-solid fa-square-plus"></i></a>
+    </p>
+
+    <QuickGrid Class="table" Items="DbFactory.CreateDbContext().Subjects.Include(m => m.Major)">
+        <PropertyColumn Property="subjects => subjects.Name" />
+        <PropertyColumn Property="subjects => subjects.Major.Name" Title="Major" />
+        <PropertyColumn Property="subjects => subjects.Code" />
+
+        <TemplateColumn Context="subjects">
+            <a href="@($"subjects/edit?id={subjects.Id}")"><i class="fa-solid fa-pen-to-square"></i></a> |
+            <a href="@($"subjects/details?id={subjects.Id}")"><i class="fa-solid fa-circle-info"></i></a> |
+            <a href="@($"subjects/delete?id={subjects.Id}")"><i class="fa-solid fa-trash"></i></a>
+        </TemplateColumn>
+    </QuickGrid>
+}

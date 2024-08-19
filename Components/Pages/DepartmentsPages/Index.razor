@@ -3,24 +3,68 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using BlazorApp3.Models
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IDbContextFactory<BlazorApp3.Data.ApplicationDbContext> DbFactory
-@using Microsoft.AspNetCore.Authorization
-
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Index</PageTitle>
 
-<h1>Departments</h1>
+@code {
+    private bool isAuthenticated;
 
-<p>
-    <a href="departments/create"><i class="fa-solid fa-square-plus"></i></a>
-</p>
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity.IsAuthenticated;
 
-<QuickGrid Class="table" Items="DbFactory.CreateDbContext().Departments">
-    <PropertyColumn Property="departments => departments.Name" />
+        if (!isAuthenticated)
+        {
+            // Thực hiện điều hướng ngay lập tức
+            Navigation.NavigateTo("/Account/Login", true);
+            return; // Trả về ngay để tránh việc tiếp tục render trang
+        }
+    }
+}
 
-    <TemplateColumn Context="departments">
-        <a href="@($"departments/edit?id={departments.Id}")"><i class="fa-solid fa-pen-to-square"></i></a> |
-        <a href="@($"departments/details?id={departments.Id}")"><i class="fa-solid fa-circle-info"></i></a> |
-        <a href="@($"departments/delete?id={departments.Id}")"><i class="fa-solid fa-trash"></i></a>
-    </TemplateColumn>
-</QuickGrid>
+<PageTitle>Departments</PageTitle>
+@if (isAuthenticated)
+{
+    <h1 style="text-align:center">Departments</h1>
+
+    <p>
+        <a  href="departments/create" class="btn btn-success" id="create-department">Create New Departments</a>
+    </p>
+    <style>
+        #create-department:hover {
+        color:black;
+        background-color:whitesmoke;
+
+
+        }
+    </style>
+    <QuickGrid Class="table" Items="DbFactory.CreateDbContext().Departments">
+        <PropertyColumn Property="departments => departments.Name" />
+
+        <TemplateColumn Context="departments">
+            <div class="button-container">
+                <a class="btn btn-success" href="@($"departments/edit?id={departments.Id}")">Edit</a> 
+                <a class="btn btn-danger" href="@($"departments/details?id={departments.Id}")">Details</a>
+                <a class="btn btn-outline-success" href="@($"departments/delete?id={departments.Id}")">Delete</a>
+            </div>
+        </TemplateColumn>
+        <style>
+            .button-container {
+            display: flex;
+            justify-content: flex-end; 
+            gap: 5px; 
+            }
+
+            .table {
+            border: 1px solid black;
+            padding: 1px;
+            margin: 5px;
+            }
+        </style>
+    </QuickGrid>
+}

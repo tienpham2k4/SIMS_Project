@@ -3,24 +3,32 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using BlazorApp3.Models
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IDbContextFactory<BlazorApp3.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Index</PageTitle>
 
-<h1>Semesters</h1>
 
-<p>
-    <a href="semesters/create"><i class="fa-solid fa-square-plus"></i></a>
-</p>
 
-<QuickGrid Class="table" Items="DbFactory.CreateDbContext().Semesters">
-    <PropertyColumn Property="semesters => semesters.Name" />
-    <PropertyColumn Property="semesters => semesters.StartDate" />
-    <PropertyColumn Property="semesters => semesters.EndDate" />
 
-    <TemplateColumn Context="semesters">
-        <a href="@($"semesters/edit?id={semesters.Id}")"><i class="fa-solid fa-pen-to-square"></i></a> |
-        <a href="@($"semesters/details?id={semesters.Id}")"><i class="fa-solid fa-circle-info"></i></a> |
-        <a href="@($"semesters/delete?id={semesters.Id}")"><i class="fa-solid fa-trash"></i></a>
-    </TemplateColumn>
-</QuickGrid>
+{
+    <h1>Semesters</h1>
+
+    <p>
+        <a href="semesters/create"><i class="fa-solid fa-square-plus"></i></a>
+    </p>
+
+    <QuickGrid Class="table" Items="DbFactory.CreateDbContext().Semesters">
+        <PropertyColumn Property="semesters => semesters.Name" />
+        <PropertyColumn Property="semesters => semesters.StartDate" />
+        <PropertyColumn Property="semesters => semesters.EndDate" />
+
+        <TemplateColumn Context="semesters">
+            <a href="@($"semesters/edit?id={semesters.Id}")"><i class="fa-solid fa-pen-to-square"></i></a> |
+            <a href="@($"semesters/details?id={semesters.Id}")"><i class="fa-solid fa-circle-info"></i></a> |
+            <a href="@($"semesters/delete?id={semesters.Id}")"><i class="fa-solid fa-trash"></i></a>
+        </TemplateColumn>
+    </QuickGrid>
+}

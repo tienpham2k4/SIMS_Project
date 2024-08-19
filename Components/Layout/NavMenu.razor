@@ -9,11 +9,41 @@
 
 
 
-<div class="top-row ps-3 navbar navbar-dart">
+<div id="row" class="top-row ps-3 navbar navbar-dark"  >
     <div class="container-fluid">
-        <a class="navbar-brand" href=""></a>
-    </div>
+        <a class="navbar-brand" href="" <img src="lib/logo.jpg" width="50"/></a>
 </div>
+</div>
+<style>
+    #row {
+        height: fit-content;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color:;
+         /* Điều chỉnh màu sắc nền nếu cần */
+        z-index: 1030; /* Giữ logo và navbar phía trên các phần tử khác */
+    }
+
+    .container-fluid {
+        display: flex;
+        align-items: center;
+    }
+
+    img {
+        height: 50px;
+        margin-right: 15px;
+    }
+
+    .navbar-toggler {
+        margin-left: auto; /* Đẩy navbar-toggler về phía bên phải */
+    }
+
+    .nav-scrollable {
+        margin-top: 60px; /* Điều chỉnh để tránh chồng chéo với navbar */
+    }
+</style>
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 

@@ -1,0 +1,128 @@
+﻿@page "/students/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using BlazorApp3.Models
+@using BlazorApp3.Data
+@inject IDbContextFactory<BlazorApp3.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Student</PageTitle>
+
+<h1><i class="fa-solid fa-pen-to-square"></i> Edit Student</h1>
+
+@if (Student is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Student" OnValidSubmit="UpdateStudent" FormName="editForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <input type="hidden" name="Student.Id" value="@Student.Id" />
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Student.Name" class="form-control" />
+                    <ValidationMessage For="() => Student.Name" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="code" class="form-label">Code:</label>
+                    <InputText id="code" @bind-Value="Student.Code" class="form-control" />
+                    <ValidationMessage For="() => Student.Code" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="phonenumber" class="form-label">Phone Number:</label>
+                    <InputText id="phonenumber" @bind-Value="Student.PhoneNumber" class="form-control" />
+                    <ValidationMessage For="() => Student.PhoneNumber" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="Student.Email" class="form-control" />
+                    <ValidationMessage For="() => Student.Email" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role:</label>
+                    <InputText id="role" @bind-Value="Student.Role" class="form-control" />
+                    <ValidationMessage For="() => Student.Role" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="sex" class="form-label">Sex:</label>
+                    <InputText id="sex" @bind-Value="Student.Sex" class="form-control" />
+                    <ValidationMessage For="() => Student.Sex" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address:</label>
+                    <InputText id="address" @bind-Value="Student.Address" class="form-control" />
+                    <ValidationMessage For="() => Student.Address" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/students">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string Id { get; set; } = string.Empty;
+    [SupplyParameterFromForm]
+    public ApplicationUser? Student { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Student ??= await context.ApplicationUser.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Student is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task UpdateStudent()
+{
+    using var context = DbFactory.CreateDbContext();
+    context.Attach(Student!).State = EntityState.Modified;
+        Console.WriteLine($"Name: {Student.Name}, Code: {Student.Code}, Email: {Student.Email}");
+    try
+    {
+        await context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        if (!StudentExists(Student!.Id))
+        {
+            // Bản ghi không còn tồn tại, chuyển hướng đến trang "not found" hoặc hiển thị thông báo lỗi
+            NavigationManager.NavigateTo("notfound");
+        }
+        else
+        {
+            // Tải lại thực thể và thông báo cho người dùng về xung đột cạnh tranh
+            Student = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(m => m.Id == Student.Id);
+            // Tùy chọn: Hiển thị thông báo cho người dùng rằng dữ liệu đã được cập nhật bởi người khác
+        }
+    }
+
+    NavigationManager.NavigateTo("/students");
+}
+
+bool StudentExists(string id)
+{
+    using var context = DbFactory.CreateDbContext();
+    return context.ApplicationUser.Any(e => e.Id == id);
+}
+}

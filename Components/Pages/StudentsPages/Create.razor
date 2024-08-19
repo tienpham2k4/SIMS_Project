@@ -37,6 +37,16 @@
                 <InputText id="name" @bind-Value="Students.Code" class="form-control" />
                 <ValidationMessage For="() => Students.Code" class="text-danger" />
             </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Address:</label>
+                <InputText id="name" @bind-Value="Students.Address" class="form-control" />
+                <ValidationMessage For="() => Students.Address" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Sex:</label>
+                <InputText id="name" @bind-Value="Students.Sex" class="form-control" />
+                <ValidationMessage For="() => Students.Sex" class="text-danger" />
+            </div>
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
                 <label for="name" class="form-label">Email:</label>
@@ -81,6 +91,8 @@
             Code = Students.Code,
             Name = Students.Name,
             PhoneNumber = Students.PhoneNumber,
+            Address = Students.Address,
+            Sex = Students.Sex,
             Email = Students.Email,
             UserName = Students.Code,
             NormalizedEmail = Students.Email.ToUpper(),

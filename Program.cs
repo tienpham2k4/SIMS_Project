@@ -50,24 +50,33 @@ namespace BlazorApp3
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
-             .AddCookie(options =>
-             {
-                 options.Events.OnValidatePrincipal = async context =>
-                 {
-                     var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
-                     var user = await userManager.GetUserAsync(context.Principal);
+                    .AddCookie(options =>
+                    {
+                        options.Events.OnValidatePrincipal = async context =>
+                        {
+                            var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+                            var user = await userManager.GetUserAsync(context.Principal);
 
-                     if (user != null)
-                     {
-                         // Add or update role claim
-                         var claimsIdentity = (ClaimsIdentity)context.Principal.Identity;
-                         if (!claimsIdentity.HasClaim(c => c.Type == "Role"))
-                         {
-                             claimsIdentity.AddClaim(new Claim("Role", user.Role));
-                         }
-                     }
-                 };
-             });
+                            if (user != null)
+                            {
+                                var claimsIdentity = (ClaimsIdentity)context.Principal.Identity;
+                                if (!claimsIdentity.HasClaim(c => c.Type == "Role"))
+                                {
+                                    claimsIdentity.AddClaim(new Claim("Role", user.Role));
+                                }
+                            }
+                        };
+                        options.Events.OnRedirectToAccessDenied = context =>
+                        {
+                            context.Response.Redirect("/Account/AccessDenied");
+                            return Task.CompletedTask;
+                        };
+                        options.Events.OnRedirectToLogin = context =>
+                        {
+                            context.Response.Redirect("/Account/Login");
+                            return Task.CompletedTask;
+                        };
+                    });
             builder.Services.AddControllers();
             builder.Services.AddAuthorization(options =>
             {
